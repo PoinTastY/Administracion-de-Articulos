@@ -6,10 +6,10 @@ import { La_Belle_Aurore } from "next/font/google";
 
 async function getArticles(): Promise<DropDownItem[]> {
 
-    const apiBaseurl = process.env.ARTICLES_API_BASE_URL;
+    const apiBaseurl = process.env.NEXT_PUBLIC_ARTICLES_API_BASE_URL;
 
     if (!apiBaseurl) {
-        throw new Error("ARTICLES_API_BASE_URL is not defined")
+        throw new Error("NEXT_PUBLIC_ARTICLES_API_BASE_URL is not defined")
     }
 
     const result = await fetch(`${apiBaseurl}/dropdown/articles`)
