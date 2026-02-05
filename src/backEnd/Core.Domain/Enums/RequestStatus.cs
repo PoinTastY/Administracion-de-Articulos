@@ -2,9 +2,23 @@
 {
     public enum RequestStatus
     {
-        Submitted = 1,
-        Reviewing = 2,
+        PreAproval = 1,
+        Submitted = 2,
+        Reviewing = 3,
         Approved = 9,
         Declined = 10,
+    }
+
+    public static class RequestStatusExtension
+    {
+        public static IEnumerable<RequestStatus> GetAll()
+        {
+            return Enum.GetValues(typeof(RequestStatus)).Cast<RequestStatus>();
+        }
+
+        public static string GetName(this RequestStatus status)
+        {
+            return status.ToString();
+        }
     }
 }

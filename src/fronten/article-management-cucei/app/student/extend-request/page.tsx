@@ -1,0 +1,36 @@
+import ExtendRequestForm from "@/components/student/extend-form";
+import { DropDownItem } from "@/types/drop-down-item";
+import { GenericCategoryDto } from "@/types/drop-down-item";
+import { RequestStatus } from "@/types/enums/extend-status";
+import { La_Belle_Aurore } from "next/font/google";
+
+async function getArticles(): Promise<DropDownItem[]> {
+
+    const apiBaseurl = process.env.ARTICLES_API_BASE_URL;
+
+    if (!apiBaseurl) {
+        throw new Error("ARTICLES_API_BASE_URL is not defined")
+    }
+
+    const result = await fetch(`${apiBaseurl}/dropdown/articles`)
+    {
+        cache: "force-cache"
+    };
+
+    const data = await result.json();
+
+    if (!result.ok) {
+        throw new Error("Failed to fetch articles :c");
+    }
+
+    return data.map((a: GenericCategoryDto) => ({
+        id: a.id,
+        label: a.name
+    }));
+}
+
+export default async function Page() {
+    const articles: DropDownItem[] = await getArticles();
+
+    return <ExtendRequestForm articles={articles} />;
+}
