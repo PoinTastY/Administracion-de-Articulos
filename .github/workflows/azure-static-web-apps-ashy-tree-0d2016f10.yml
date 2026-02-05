@@ -43,7 +43,7 @@ jobs:
           output_location: "build"
           github_id_token: ${{ steps.idtoken.outputs.result }}
         env:
-          ARTICLES_API_BASE_URL: ${{ secrets.ARTICLES_API_BASE_URL }}
+          NEXT_PUBLIC_ARTICLES_API_BASE_URL: ${{ secrets.ARTICLES_API_BASE_URL }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -55,5 +55,6 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           action: "close"
+
 
 
