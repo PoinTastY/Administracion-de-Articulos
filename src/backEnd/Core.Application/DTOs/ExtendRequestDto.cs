@@ -1,12 +1,12 @@
 ﻿namespace Core.Application.DTOs
 {
-    public class ExtendRequestDto
+    public record ExtendRequestDto
     {
-        public required string RequesterEmail { get; set; }
-        public required string StudentCode { get; set; }
-        public required int Article { get; set; }
-        public required string DriveViewUrl { get; set; }
-        public required string DriveFileId { get; set; }
-        public required string Reason { get; set; }
+        public required string StudentCode { get; init; }
+        public required int Article { get; init; }
+        public required string EvidenceFileUrl { get; init; }
+        public required string Reason { get; init; }
+        public string? Status { get; init; }
+        public DateTime? CreatedAt { get; init; }
     }
 }

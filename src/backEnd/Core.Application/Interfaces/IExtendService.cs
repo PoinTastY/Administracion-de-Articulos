@@ -12,6 +12,7 @@ namespace Core.Application.Interfaces
         /// <returns>The PK of the created entity</returns>
         Task<int> CreateExtendRequestAsync(ExtendRequestDto request);
         Task<ICollection<ExtendRequestDto>> GetByStatusAsync(RequestStatus status, int page = 1, int pageSize = 50);
-        Task<ExtendRequestDto> GetLastRequestByStudentCodeAsync(string code); 
+        Task<ExtendRequestDto?> GetLastRequestByStudentCodeAsync(string code);
+        Task<ExtendRequestDto?> GetByIdAsync(int id);
     }
 }

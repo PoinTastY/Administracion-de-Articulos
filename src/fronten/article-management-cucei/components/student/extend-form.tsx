@@ -18,6 +18,7 @@ export default function ExtendRequestForm({ articles }: Props) {
         evidenceFileUrl: "",
         justification: ""
     });
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
 
     const handleChange = (
@@ -35,9 +36,13 @@ export default function ExtendRequestForm({ articles }: Props) {
 
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] ?? null;
+        setSelectedFile(file);
+    };
+
+    const handleSubmit = (e: any) => {
         e.preventDefault();
-        console.log("Submitting: ", extendFormData)
     };
 
     return (
@@ -82,6 +87,7 @@ export default function ExtendRequestForm({ articles }: Props) {
                             value={extendFormData.studentCode}
                             onChange={handleChange}
                             required
+                            maxLength={9}
                             placeholder="A01234567"
                             className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                         />
@@ -108,6 +114,20 @@ export default function ExtendRequestForm({ articles }: Props) {
                                 </option>
                             ))}
                         </select>
+                    </label>
+
+                    <label className="block text-sm font-medium text-slate-700" htmlFor="evidenceFile">
+                        Evidence File
+                        <input
+                            id="evidenceFile"
+                            name="evidenceFile"
+                            type="file"
+                            onChange={handleFileChange}
+                            className="mt-2 w-full rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-slate-800"
+                        />
+                        <span className="mt-1 block text-xs text-slate-400">
+                            Attach any supporting document.
+                        </span>
                     </label>
 
                     <label className="block text-sm font-medium text-slate-700" htmlFor="justification">
