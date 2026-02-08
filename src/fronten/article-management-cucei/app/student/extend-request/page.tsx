@@ -1,8 +1,6 @@
 import ExtendRequestForm from "@/components/student/extend-form";
 import { DropDownItem } from "@/types/drop-down-item";
 import { GenericCategoryDto } from "@/types/drop-down-item";
-import { RequestStatus } from "@/types/enums/extend-status";
-import { La_Belle_Aurore } from "next/font/google";
 
 async function getArticles(): Promise<DropDownItem[]> {
 
