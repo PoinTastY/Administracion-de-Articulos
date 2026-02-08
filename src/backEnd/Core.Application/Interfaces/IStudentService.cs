@@ -18,4 +18,6 @@ public interface IStudentService
     /// <param name="student"></param>
     /// <returns>True if the update was successful, otherwise false</returns>
     Task<bool> UpdateAsync(StudentDto student);
+
+    Task<StudentDto?> GetByCodeAsync(string studentCode);
 }

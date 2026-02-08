@@ -3,15 +3,39 @@
 import { DropDownItem } from "@/types/drop-down-item";
 import { RequestStatus } from "@/types/enums/extend-status";
 import type { ExtendRequest } from "@/types/extend-request";
+import type { StudentDto } from "@/types/student-dto";
+import {
+    createExtendRequest,
+    createOrUpdateStudent,
+    uploadEvidence,
+} from "@/services/article-management-client";
 import React, { useState } from "react";
 
 type Props = {
     articles: DropDownItem[];
 }
 
+type StudentFormData = {
+    studentCode: string;
+    firstName: string;
+    secondName: string;
+    lastname: string;
+    secondLastName: string;
+    email: string;
+    careerStart: string;
+}
+
 export default function ExtendRequestForm({ articles }: Props) {
+    const [studentFormData, setStudentFormData] = useState<StudentFormData>({
+        studentCode: "",
+        firstName: "",
+        secondName: "",
+        lastname: "",
+        secondLastName: "",
+        email: "",
+        careerStart: "",
+    });
     const [extendFormData, setExtendFormData] = useState<ExtendRequest>({
-        requesterEmail: "",
         studentCode: "",
         article: 0,
         status: RequestStatus.Approved,
@@ -19,6 +43,26 @@ export default function ExtendRequestForm({ articles }: Props) {
         justification: ""
     });
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+
+
+    const handleStudentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        setStudentFormData(prev => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        if (name === "studentCode") {
+            setExtendFormData(prev => ({
+                ...prev,
+                studentCode: value,
+            }));
+        }
+    };
 
 
     const handleChange = (
@@ -41,8 +85,60 @@ export default function ExtendRequestForm({ articles }: Props) {
         setSelectedFile(file);
     };
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        setSubmitError(null);
+        setSubmitSuccess(null);
+
+        if (!selectedFile) {
+            setSubmitError("Please attach an evidence file before submitting.");
+            return;
+        }
+
+        if (extendFormData.article === 0) {
+            setSubmitError("Please select an article before submitting.");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const studentPayload: StudentDto = {
+                StudentCode: studentFormData.studentCode,
+                FirstName: studentFormData.firstName,
+                SecondName: studentFormData.secondName,
+                Lastname: studentFormData.lastname,
+                SecondLastName: studentFormData.secondLastName,
+                Email: studentFormData.email,
+                CareerStart: studentFormData.careerStart,
+            };
+
+            const savedStudent = await createOrUpdateStudent(studentPayload);
+
+            const extendId = await createExtendRequest({
+                StudentCode: savedStudent.StudentCode ?? studentPayload.StudentCode,
+                Article: extendFormData.article,
+                EvidenceFileUrl: "",
+                Reason: extendFormData.justification,
+            });
+
+            const uploadResult = await uploadEvidence(extendId, selectedFile);
+
+            setExtendFormData(prev => ({
+                ...prev,
+                evidenceFileUrl: uploadResult.FileUrl,
+            }));
+            setSubmitSuccess("Request submitted successfully.");
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "Failed to submit the request.";
+            setSubmitError(message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -64,31 +160,100 @@ export default function ExtendRequestForm({ articles }: Props) {
                 </header>
 
                 <fieldset className="space-y-5">
-                    <label className="block text-sm font-medium text-slate-700" htmlFor="requesterEmail">
-                        Requester Email
-                        <input
-                            id="requesterEmail"
-                            name="requesterEmail"
-                            type="email"
-                            value={extendFormData.requesterEmail}
-                            onChange={handleChange}
-                            required
-                            placeholder="name@university.edu"
-                            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-                        />
-                    </label>
-
                     <label className="block text-sm font-medium text-slate-700" htmlFor="studentCode">
                         Student Code
                         <input
                             id="studentCode"
                             name="studentCode"
                             type="text"
-                            value={extendFormData.studentCode}
-                            onChange={handleChange}
+                            value={studentFormData.studentCode}
+                            onChange={handleStudentChange}
                             required
                             maxLength={9}
                             placeholder="A01234567"
+                            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                        />
+                    </label>
+
+                    <label className="block text-sm font-medium text-slate-700" htmlFor="firstName">
+                        First Name
+                        <input
+                            id="firstName"
+                            name="firstName"
+                            type="text"
+                            value={studentFormData.firstName}
+                            onChange={handleStudentChange}
+                            required
+                            placeholder="Maria"
+                            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                        />
+                    </label>
+
+                    <label className="block text-sm font-medium text-slate-700" htmlFor="secondName">
+                        Second Name
+                        <input
+                            id="secondName"
+                            name="secondName"
+                            type="text"
+                            value={studentFormData.secondName}
+                            onChange={handleStudentChange}
+                            required
+                            placeholder="Guadalupe"
+                            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                        />
+                    </label>
+
+                    <label className="block text-sm font-medium text-slate-700" htmlFor="lastname">
+                        Last Name
+                        <input
+                            id="lastname"
+                            name="lastname"
+                            type="text"
+                            value={studentFormData.lastname}
+                            onChange={handleStudentChange}
+                            required
+                            placeholder="Hernandez"
+                            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                        />
+                    </label>
+
+                    <label className="block text-sm font-medium text-slate-700" htmlFor="secondLastName">
+                        Second Last Name
+                        <input
+                            id="secondLastName"
+                            name="secondLastName"
+                            type="text"
+                            value={studentFormData.secondLastName}
+                            onChange={handleStudentChange}
+                            required
+                            placeholder="Lopez"
+                            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                        />
+                    </label>
+
+                    <label className="block text-sm font-medium text-slate-700" htmlFor="email">
+                        Student Email
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={studentFormData.email}
+                            onChange={handleStudentChange}
+                            required
+                            placeholder="name@university.edu"
+                            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                        />
+                    </label>
+
+                    <label className="block text-sm font-medium text-slate-700" htmlFor="careerStart">
+                        Career Start
+                        <input
+                            id="careerStart"
+                            name="careerStart"
+                            type="date"
+                            value={studentFormData.careerStart}
+                            onChange={handleStudentChange}
+                            required
                             className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                         />
                     </label>
@@ -154,11 +319,21 @@ export default function ExtendRequestForm({ articles }: Props) {
                     </p>
                     <button
                         type="submit"
+                        disabled={isSubmitting}
                         className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
                     >
-                        Submit Request
+                        {isSubmitting ? "Submitting..." : "Submit Request"}
                     </button>
                 </div>
+                {(submitError || submitSuccess) && (
+                    <p
+                        className={`mt-4 text-sm ${
+                            submitError ? "text-rose-600" : "text-emerald-600"
+                        }`}
+                    >
+                        {submitError ?? submitSuccess}
+                    </p>
+                )}
             </form>
         </section>
     );

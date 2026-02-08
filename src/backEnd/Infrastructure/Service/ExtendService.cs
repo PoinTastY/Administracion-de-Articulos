@@ -11,9 +11,11 @@ namespace Infrastructure.Service;
 public class ExtendService : IExtendService
 {
     private readonly IExtendRepo _extendRepo;
-    public ExtendService(IExtendRepo extendRepo)
+    private readonly IBlobStorageClient _blobStorageClient;
+    public ExtendService(IExtendRepo extendRepo, IBlobStorageClient blobStorageClient)
     {
         _extendRepo = extendRepo;
+        _blobStorageClient = blobStorageClient;
     }
 
     public async Task<int> CreateExtendRequestAsync(ExtendRequestDto request)
@@ -86,5 +88,37 @@ public class ExtendService : IExtendService
             Status = request.Status.GetName(),
             CreatedAt = request.CreatedAt
         };
+    }
+
+    public async Task<string> UploadEvidenceAsync(int id, Stream fileStream, string fileName, string? contentType)
+    {
+        if (id <= 0)
+        {
+            throw new ArgumentException("Invalid request ID.", nameof(id));
+        }
+
+        if (_blobStorageClient == null)
+        {
+            throw new InvalidOperationException("Blob storage client is not configured.");
+        }
+
+        return await _blobStorageClient.UploadAsync(fileStream, fileName, contentType, id.ToString());
+    }
+
+    public async Task<bool> SaveEvidenceUrlAsync(int id, string fileUrl)
+    {
+        if (id <= 0 || string.IsNullOrWhiteSpace(fileUrl))
+            return false;
+
+        ExtendRequest? request = await _extendRepo.GetByIdAsync(id);
+
+        if (request is null)
+            return false;
+
+        request.EvidenceFileUrl = fileUrl;
+
+        await _extendRepo.UpdateAsync(request);
+
+        return true;
     }
 }

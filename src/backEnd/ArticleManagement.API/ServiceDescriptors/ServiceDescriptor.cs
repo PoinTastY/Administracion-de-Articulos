@@ -36,6 +36,7 @@ public static class ServiceDescriptor
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IStudentRepo, StudentRepo>();
+        services.AddScoped<IExtendRepo, ExtendRepo>();
 
         return services;
     }
@@ -43,6 +44,8 @@ public static class ServiceDescriptor
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IExtendService, ExtendService>();
+        services.AddScoped<IBlobStorageClient, AzureBlobStorageClient>();
 
         return services;
     }

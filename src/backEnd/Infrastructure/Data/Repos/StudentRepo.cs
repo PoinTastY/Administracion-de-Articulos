@@ -21,7 +21,6 @@ public class StudentRepo : IStudentRepo
         //if student exists
         if (existingStudent is not null)
         {
-            _logger.LogWarning("Attempted to add a student with existing StudentCode {StudentCode}.", student.StudentCode);
             student.Id = existingStudent.Id;
             return false;
         }
@@ -51,5 +50,10 @@ public class StudentRepo : IStudentRepo
         await _dbContext.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<Student?> GetByCodeAsync(string studentCode)
+    {
+        return await _dbContext.Students.AsNoTracking().FirstOrDefaultAsync(s => s.StudentCode == studentCode);
     }
 }

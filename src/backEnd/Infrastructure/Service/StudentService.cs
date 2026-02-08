@@ -58,20 +58,59 @@ public class StudentService : IStudentService
             bool isAdded = await _studentRepo.AddStudent(studentEntity);
 
             if (isAdded)
-            {
                 return studentEntity.Id;
-            }
-            else
-            {
-                _logger.LogWarning("Failed to add a new student with StudentCode {StudentCode}.", student.StudentCode);
 
+            if (studentEntity.Id <= 0)
+            {
+                _logger.LogError("Failed to add a new student with StudentCode {StudentCode}, and no existing student found.", student.StudentCode);
                 return 0;
             }
+
+            if (await UpdateAsync(student))
+            {
+                _logger.LogInformation("Student with ID {StudentId} updated successfully after failed add attempt.", studentEntity.Id);
+                return studentEntity.Id;
+            }
+
+            _logger.LogError("Failed to add or update student with ID {StudentId}.", studentEntity.Id);
+            return 0;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while adding a new student with StudentCode {StudentCode}.", student.StudentCode);
             return 0;
         }
+    }
+
+    public async Task<StudentDto?> GetByCodeAsync(string studentCode)
+    {
+        try
+        {
+            Student? studentEntity = await _studentRepo.GetByCodeAsync(studentCode);
+
+            if (studentEntity == null)
+            {
+                _logger.LogInformation("No student found with StudentCode {StudentCode}.", studentCode);
+                return null;
+            }
+
+            return new StudentDto
+            {
+                Id = studentEntity.Id,
+                StudentCode = studentEntity.StudentCode,
+                FirstName = studentEntity.FirstName,
+                SecondName = studentEntity.SecondName,
+                Lastname = studentEntity.Lastname,
+                SecondLastName = studentEntity.SecondLastName,
+                Email = studentEntity.Email,
+                CareerStart = studentEntity.CareerStart
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while retrieving the student with StudentCode {StudentCode}.", studentCode);
+            return null;
+        }
+
     }
 }

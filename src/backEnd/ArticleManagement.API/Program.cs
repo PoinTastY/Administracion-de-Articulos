@@ -17,6 +17,19 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 builder.Services.AddControllers();
 
+string frontendOrigin = Environment.GetEnvironmentVariable("ARTICLE_MANAGEMENT_FRONTEND_ORIGIN")
+    ?? throw new InvalidOperationException("Environment variable 'ARTICLE_MANAGEMENT_FRONTEND_ORIGIN' is not set.");
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins(frontendOrigin)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
@@ -26,6 +39,8 @@ builder.Services.AddArticleManagementServices();
 var app = builder.Build();
 
 app.UseSerilogRequestLogging(); // logs HTTP requests
+
+app.UseCors("Frontend");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

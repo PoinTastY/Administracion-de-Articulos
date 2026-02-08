@@ -25,14 +25,8 @@ namespace ArticleManagement.API.Controllers
             {
                 studentDto = studentDto with { Id = resultingKey };
 
-                _logger.LogInformation("Student created successfully with ID {StudentId}.", resultingKey);
-                return CreatedAtAction(nameof(CreateStudent), new { id = resultingKey }, studentDto);
-            }
-
-            if (await _studentService.UpdateAsync(studentDto))
-            {
-                _logger.LogInformation("Student with ID {StudentId} updated successfully.", studentDto.Id);
-                return Ok(new { student = studentDto, message = "Student updated successfully." });
+                _logger.LogInformation("Student created/updated successfully with ID {StudentId}.", resultingKey);
+                return CreatedAtAction(nameof(CreateStudent), new { extendId = resultingKey }, studentDto);
             }
 
             _logger.LogError("Failed to create or update student with ID {StudentId}.", studentDto.Id);

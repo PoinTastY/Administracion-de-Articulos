@@ -1,5 +1,6 @@
 ﻿using Core.Application.DTOs;
 using Core.Domain.Enums;
+using System.IO;
 
 namespace Core.Application.Interfaces
 {
@@ -14,5 +15,7 @@ namespace Core.Application.Interfaces
         Task<ICollection<ExtendRequestDto>> GetByStatusAsync(RequestStatus status, int page = 1, int pageSize = 50);
         Task<ExtendRequestDto?> GetLastRequestByStudentCodeAsync(string code);
         Task<ExtendRequestDto?> GetByIdAsync(int id);
+        Task<string> UploadEvidenceAsync(int id, Stream fileStream, string fileName, string? contentType);
+        Task<bool> SaveEvidenceUrlAsync(int id, string fileUrl);
     }
 }

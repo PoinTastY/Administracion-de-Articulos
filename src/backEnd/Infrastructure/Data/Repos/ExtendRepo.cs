@@ -1,11 +1,12 @@
 using Core.Domain.Entities;
 using Core.Domain.Enums;
+using Core.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Repos;
 
-public class ExtendRepo
+public class ExtendRepo : IExtendRepo
 {
     private readonly ArticleManagementDbContext _context;
     private readonly ILogger<ExtendRepo> _logger;

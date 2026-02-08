@@ -14,4 +14,5 @@ public interface IStudentRepo
     /// </returns>
     Task<bool> AddStudent(Student student);
     Task<bool> UpdateStudent(Student student);
+    Task<Student?> GetByCodeAsync(string studentCode);
 }
