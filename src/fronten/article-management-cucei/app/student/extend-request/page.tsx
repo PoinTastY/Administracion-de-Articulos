@@ -15,7 +15,12 @@ async function getArticles(): Promise<DropDownItem[]> {
     });
 
     if (!result.ok) {
-        throw new Error("Failed to fetch articles :c");
+        // Get response body for debugging
+        const errorBody = await result.text().catch(() => 'Unable to read response body');
+        throw new Error(
+            `Failed to fetch articles: ${result.status} ${result.statusText}. ` +
+            `Body: ${errorBody}. URL: ${apiBaseurl}/dropdown/articles`
+        );
     }
 
     const data = await result.json();
