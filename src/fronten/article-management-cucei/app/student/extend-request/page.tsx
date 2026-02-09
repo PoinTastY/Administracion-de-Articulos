@@ -10,16 +10,15 @@ async function getArticles(): Promise<DropDownItem[]> {
         throw new Error("NEXT_PUBLIC_ARTICLES_API_BASE_URL is not defined")
     }
 
-    const result = await fetch(`${apiBaseurl}/dropdown/articles`)
-    {
+    const result = await fetch(`${apiBaseurl}/dropdown/articles`, {
         cache: "force-cache"
-    };
-
-    const data = await result.json();
+    });
 
     if (!result.ok) {
         throw new Error("Failed to fetch articles :c");
     }
+
+    const data = await result.json();
 
     return data.map((a: GenericCategoryDto) => ({
         id: a.id,
