@@ -42,7 +42,17 @@ async function getArticles(): Promise<DropDownItem[]> {
 }
 
 export default async function Page() {
-    const articles: DropDownItem[] = await getArticles();
+    let articles: DropDownItem[] = [];
+    let articlesError: string | null = null;
 
-    return <ExtendRequestForm articles={articles} />;
+    try {
+        articles = await getArticles();
+    } catch (error) {
+        articlesError =
+            error instanceof Error
+                ? error.message
+                : "Failed to load articles.";
+    }
+
+    return <ExtendRequestForm articles={articles} articlesError={articlesError} />;
 }

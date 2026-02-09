@@ -13,6 +13,7 @@ import React, { useState } from "react";
 
 type Props = {
     articles: DropDownItem[];
+    articlesError?: string | null;
 }
 
 type StudentFormData = {
@@ -25,7 +26,7 @@ type StudentFormData = {
     careerStart: string;
 }
 
-export default function ExtendRequestForm({ articles }: Props) {
+export default function ExtendRequestForm({ articles, articlesError }: Props) {
     const [studentFormData, setStudentFormData] = useState<StudentFormData>({
         studentCode: "",
         firstName: "",
@@ -90,6 +91,11 @@ export default function ExtendRequestForm({ articles }: Props) {
 
         setSubmitError(null);
         setSubmitSuccess(null);
+
+        if (articlesError) {
+            setSubmitError(articlesError);
+            return;
+        }
 
         if (!selectedFile) {
             setSubmitError("Please attach an evidence file before submitting.");
@@ -160,6 +166,11 @@ export default function ExtendRequestForm({ articles }: Props) {
                 </header>
 
                 <fieldset className="space-y-5">
+                    {articlesError && (
+                        <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                            {articlesError}
+                        </p>
+                    )}
                     <label className="block text-sm font-medium text-slate-700" htmlFor="studentCode">
                         Student Code
                         <input
@@ -327,9 +338,8 @@ export default function ExtendRequestForm({ articles }: Props) {
                 </div>
                 {(submitError || submitSuccess) && (
                     <p
-                        className={`mt-4 text-sm ${
-                            submitError ? "text-rose-600" : "text-emerald-600"
-                        }`}
+                        className={`mt-4 text-sm ${submitError ? "text-rose-600" : "text-emerald-600"
+                            }`}
                     >
                         {submitError ?? submitSuccess}
                     </p>
