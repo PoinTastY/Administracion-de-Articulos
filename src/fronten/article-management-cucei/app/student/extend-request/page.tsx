@@ -2,6 +2,8 @@ import ExtendRequestForm from "@/components/student/extend-form";
 import { DropDownItem } from "@/types/drop-down-item";
 import { GenericCategoryDto } from "@/types/drop-down-item";
 
+export const dynamic = "force-dynamic";
+
 async function getArticles(): Promise<DropDownItem[]> {
     const apiBaseurl = process.env.NEXT_PUBLIC_ARTICLES_API_BASE_URL;
 
