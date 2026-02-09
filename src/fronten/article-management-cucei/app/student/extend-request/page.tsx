@@ -11,16 +11,29 @@ async function getArticles(): Promise<DropDownItem[]> {
         throw new Error("NEXT_PUBLIC_ARTICLES_API_BASE_URL is not defined");
     }
 
-    const result = await fetch(`${apiBaseurl}/dropdown/articles`)
-    {
-        cache: "force-cache"
-    };
-
-    const data = await result.json();
+    const result = await fetch(`${apiBaseurl}/dropdown/articles`, {
+        cache: "no-store",
+        headers: {
+            Accept: "application/json",
+        },
+    });
 
     if (!result.ok) {
-        throw new Error("Failed to fetch articles :c");
+        const errorBody = await result.text();
+        throw new Error(
+            `Failed to fetch articles (${result.status}): ${errorBody.slice(0, 200)}`
+        );
     }
+
+    const contentType = result.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+        const errorBody = await result.text();
+        throw new Error(
+            `Expected JSON but got ${contentType || "unknown"}: ${errorBody.slice(0, 200)}`
+        );
+    }
+
+    const data = await result.json();
 
     return data.map((a: GenericCategoryDto) => ({
         id: a.id,
