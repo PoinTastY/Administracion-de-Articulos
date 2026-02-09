@@ -27,6 +27,7 @@ type StudentFormData = {
 }
 
 export default function ExtendRequestForm({ articles, articlesError }: Props) {
+    const resolvedApiBaseUrl = process.env.NEXT_PUBLIC_ARTICLES_API_BASE_URL ?? "(not set)";
     const [studentFormData, setStudentFormData] = useState<StudentFormData>({
         studentCode: "",
         firstName: "",
@@ -162,6 +163,9 @@ export default function ExtendRequestForm({ articles, articlesError }: Props) {
                     </h1>
                     <p className="text-sm text-slate-500">
                         Submit a short request and we will review it quickly.
+                    </p>
+                    <p className="text-xs text-slate-400">
+                        API base URL: {resolvedApiBaseUrl}
                     </p>
                 </header>
 
